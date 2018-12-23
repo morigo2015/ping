@@ -10,7 +10,7 @@ import pandas as pd
 
 from my_db import MyDb
 
-result_folder = '/home/im/mypy/pmon/tst'
+result_folder = '../tst'
 PING_THRESHOLD = 25
 
 # @formatter:off
@@ -158,17 +158,20 @@ class PltPing:
             plt.close()
         self.write_stat()
 
+    @staticmethod
+    def update_server_files() -> bool:
+        cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/tst/'
+        r = subprocess.check_call(cmd,cwd=result_folder,shell=True)
+        print(f"execute command {cmd} in cwd={result_folder}")
+        return r==0
 
 if __name__ == '__main__':
     p = PltPing()
     while True:
         p.draw_all()
-        r = subprocess.check_call(f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/tst/',
-                             cwd=result_folder,
-                             shell=True)
-        if r==0:
+        if p.update_server_files():
             print(f"{datetime.datetime.now()}: Remote files are updated. Waiting for next cycle...")
             time.sleep(600)
         else:
-            print(f"File update failed. Ret code = {r}")
+            print(f"File update failed.")
             break
