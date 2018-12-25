@@ -136,6 +136,7 @@ class PltPing:
         ax.set_ylabel('Average ping\nto outside (in ms)')
 
     def write_stat(self):
+        print("updatng stat.txt")
         with open(f"{result_folder}/stat.txt", "w") as f:
             msg = f"Charts created at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             f.write(msg)
@@ -154,18 +155,20 @@ class PltPing:
             fname = f"{result_folder}/{scale}.png"
             fig.savefig(fname=fname)
             print(f"Figure for {scale} is saved to {fname}")
-            fig.show()
-            plt.close()
+            # fig.show()
+            plt.close(fig)
         self.write_stat()
 
     @staticmethod
     def update_server_files() -> bool:
+        print('updating server files ...')
         cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/tst/'
         r = subprocess.check_call(cmd,cwd=result_folder,shell=True)
-        print(f"execute command {cmd} in cwd={result_folder}")
+        # print(f"execute command {cmd} in cwd={result_folder}")
         return r==0
 
 if __name__ == '__main__':
+    print('start')
     p = PltPing()
     while True:
         p.draw_all()
