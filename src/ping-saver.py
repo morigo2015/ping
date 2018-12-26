@@ -6,7 +6,7 @@ Get ping info for each time interval and save it to MySQL table.
 import subprocess
 from typing import List, Dict, Union, Any
 
-from my_db import MyDb
+from my_db import MyDb, AuxSQL
 from interv_timer import IntervTimer
 
 HOSTS = {
@@ -51,7 +51,7 @@ class DbPing(MyDb):
     def insert_ping_item(self, ping_res: Dict[str, Any], show=False):
         query = f"""
             insert into ping values(
-                '{ping_res['host']}', '{ping_res['time']}', {self.bool_2_sql(ping_res['OK'])},
+                '{ping_res['host']}', '{ping_res['time']}', {AuxSQL.bool_2_sql(ping_res['OK'])},
                 '{ping_res['loss(%)']}', 
                 '{ping_res['min']}','{ping_res['avg']}','{ping_res['max']}','{ping_res['mdev']}'
             )
@@ -64,7 +64,7 @@ def ping(host: str, n: int = 3):
     """ ping host, parse output
     """
     results = { # by default - disconnected (to be changed if ping returns)
-        'host': host, 'time': MyDb.now_timestamp(),
+        'host': host, 'time': AuxSQL.now_timestamp(),
         'OK': False, 'loss(%)': 100, 'min': -1.0, 'avg': -1.0, 'max': -1.0, 'mdev': -1.0,  # disconnected
     }
     try:
