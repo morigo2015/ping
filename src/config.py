@@ -2,14 +2,20 @@
 
 # Folders:
 _work_dir = "~/mypy/ping/"
-_config_dir = _work_dir+"config/"
-
-import os
-os.path.
 
 
-if __name__ == "__main__":
-    print(f"host={DbParam.host}, user={DbParam.user}, database={DbParam.database}")
-    p = DbParam.passwd
-    print(DbParam.passwd)
-    print(db.passwd)
+host_info = [
+    {'name':'', 'type',}
+]
+
+host_info = {
+    'www.ua':        ['External',  0],
+    '192.168.1.1':   ['Router',    1],
+    '192.168.1.64':  ['Camera:\nold_hik',   4],
+    '192.168.1.70':  ['Camera:\nbullet',    3],
+    '192.168.1.165': ['Camera:\ndoor_bell', 2],
+}
+
+devices = [
+    'name'
+]

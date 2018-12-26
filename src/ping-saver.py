@@ -95,8 +95,7 @@ def main():
     db.create_ping_table(show=False)
     print(f' There are {db.count_ping_items()} items in ping table')
     it = IntervTimer(SLEEP_INTERV_SEC)  # interval timer to keep interval between awakes regardless of delays
-    print(f'{"time":^20s} : {"host":^15s} :'
-          f'{"OK"} :{"loss(%)":5s}: {"avg":^5s}')
+    print(f'{"time":^20s} : {"host":^15s} : {"OK"} :{"loss(%)":5s}: {"avg":^5s}')
     while True:
         for host_name in HOSTS:
             res = ping(HOSTS[host_name])
