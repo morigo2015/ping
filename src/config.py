@@ -1,21 +1,14 @@
 # config
 
+from collections import namedtuple
+from typing import List,NamedTuple
+import json
+
 # Folders:
-_work_dir = "~/mypy/ping/"
+_WORK_DIR = "/home/im/mypy/ping"
+_CONFIG_DIR = f"{_WORK_DIR}/config"
+_DEVICES_FNAME = "devices.json"
+RESULT_DIR = f"{_WORK_DIR}/to_server"
 
-
-host_info = [
-    {'name':'', 'type',}
-]
-
-host_info = {
-    'www.ua':        ['External',  0],
-    '192.168.1.1':   ['Router',    1],
-    '192.168.1.64':  ['Camera:\nold_hik',   4],
-    '192.168.1.70':  ['Camera:\nbullet',    3],
-    '192.168.1.165': ['Camera:\ndoor_bell', 2],
-}
-
-devices = [
-    'name'
-]
+DevInfo = namedtuple('DevInfo','name, host, seqn')
+Devices : List[NamedTuple] = [DevInfo._make(d) for d in json.load(open(f"{_CONFIG_DIR}/{_DEVICES_FNAME}"))]

@@ -49,7 +49,7 @@ if __name__ == "__main__":
         it = IntervTimer(10.0, logger=print)
 
         print('short sleeps')
-        for iter in range(test_steps):
+        for interv in range(test_steps):
             print(f"iter={iter} of {test_steps}")
             time.sleep(3.0 + random.random() * 5.0)
             it.wait_interval()
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         print('long sleeps, log to file')
         with open("time_interv.log", "w") as log:
             it2 = IntervTimer(10.0, logger=log.write)
-            for iter in range(test_steps):
+            for interv in range(test_steps):
                 print(f"iter={iter} of {test_steps}")
                 time.sleep(3.0 + random.random() * 50.0)
                 it2.wait_interval()

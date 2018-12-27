@@ -9,13 +9,8 @@ from typing import List, Dict, Union, Any
 from my_db import MyDb, AuxSQL
 from interv_timer import IntervTimer
 
-HOSTS = {
-    'external': 'www.ua',
-    'router': '192.168.1.1',
-    'old_hik': '192.168.1.64',
-    'bullet': '192.168.1.70',
-    'door_bell': '192.168.1.165'
-}
+from config import DevInfo,Devices
+
 SLEEP_INTERV_SEC = 60.0
 
 
@@ -95,10 +90,10 @@ def main():
     db.create_ping_table(show=False)
     print(f' There are {db.count_ping_items()} items in ping table')
     it = IntervTimer(SLEEP_INTERV_SEC)  # interval timer to keep interval between awakes regardless of delays
-    print(f'{"time":^20s} : {"host":^15s} : {"OK"} :{"loss(%)":5s}: {"avg":^5s}')
+    print(f'{"time":^20s} : {"host":^15s} :{"OK"} :{"loss(%)":5s}: {"avg":^5s}')
     while True:
-        for host_name in HOSTS:
-            res = ping(HOSTS[host_name])
+        for device in Devices:
+            res = ping(device.host)
             db.insert_ping_item(res, show=False)
             print(f'{res["time"]:20s} : {res["host"]:.>15s} : '
                   f'{"+" if res["OK"] else "-"} : {res["loss(%)"]:5.1f} : {res["avg"]:5.1f}')

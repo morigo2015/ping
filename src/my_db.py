@@ -5,7 +5,7 @@ from collections import namedtuple
 
 import mysql.connector
 
-_DB_PARAM_PATH = "/home/im/mypy/ping/db/db_param.json"
+_DB_PARAM_PATH = "/home/im/mypy/ping/config/db_param.json"
 
 class MyDb:
     """
@@ -43,7 +43,7 @@ class MyDb:
         if cls.mydb is None:
             raise RuntimeError(f"Failed to connnect to database: {cls.db_info()}")
         else:
-            print(f"Connected to databse: {cls.db_info()}")
+            print(f"Connected to database: {cls.db_info()}")
 
     @classmethod
     def db_info(cls):

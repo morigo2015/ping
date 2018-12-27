@@ -8,20 +8,10 @@ from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 import pandas as pd
 
+from config import DevInfo, Devices, RESULT_DIR
 from my_db import MyDb
 
-result_folder = '../tst'
 PING_THRESHOLD = 25
-
-# @formatter:off
-host_info = {
-    'www.ua':        ['External',  0],
-    '192.168.1.1':   ['Router',    1],
-    '192.168.1.64':  ['Camera:\nold_hik',   4],
-    '192.168.1.70':  ['Camera:\nbullet',    3],
-    '192.168.1.165': ['Camera:\ndoor_bell', 2],
-}
-# @formatter:on
 
 # noinspection PyUnresolvedReferences
 PandasFrame = pd.core.frame.DataFrame  # shortcut for annotations
@@ -31,6 +21,7 @@ class PltPing:
     """
     plot charts for ping data
     """
+
     def __init__(self):
         self.db = None  # connection to MySQL
         # SQL ->(get_ping_history)-> df_inp ->(prepare_data)-> df ->(scale_df)-> df_scales ->(draw..)-> df_.. -> charts
@@ -70,18 +61,21 @@ class PltPing:
         # sort columns (hosts_names) by host_info[host_name].seqn
         col = self.df.columns.tolist()
         # multiindex: level 0 - vars(ok,avg_rtt) level 1 - hosts;  reverse - to set external and router on top of chart
-        col2 = sorted(col, key=lambda s: host_info[s[1]][1], reverse=True)
+        # col2 = sorted(col, key=lambda s: host_info[s[1]][1], reverse=True)
+        col2 = sorted(col, key=lambda s: [d.seqn for d in Devices if d.host == s[1]], reverse=True)
+
         self.df = self.df[col2]
 
         # host --> host_names
-        self.df = self.df.rename(columns={h: host_info[h][0] for h in host_info})
+        # self.df = self.df.rename(columns={h: host_info[h][0] for h in host_info})
+        self.df = self.df.rename(columns=dict([(d.host, d.name) for d in Devices]))
         return
 
     # @formatter:off
     scales = {
-        'hour':     {'resample': '1T', 'ticks': 60, 'format':"%H:%M",    'x_base':3.0, 'units':'minutes'},
-        '24-hours': {'resample': '1H', 'ticks': 24, 'format':"%Hh",      'x_base':1.0, 'units':'hours'},
-        'month':    {'resample': '1D', 'ticks': 30, 'format':"%Y-%m-%d", 'x_base':1.0, 'units':'days'},
+        'hour':     {'resample': '1T', 'ticks': 60, 'format': "%H:%M",    'x_base': 3.0, 'units': 'minutes'},
+        '24-hours': {'resample': '1H', 'ticks': 24, 'format': "%Hh",      'x_base': 1.0, 'units': 'hours'},
+        'month':    {'resample': '1D', 'ticks': 30, 'format': "%Y-%m-%d", 'x_base': 1.0, 'units': 'days'},
     }
     # @formatter:on
 
@@ -106,9 +100,9 @@ class PltPing:
 
         # set x axis
         ax.xaxis.set_major_locator(ticker.IndexLocator(self.scales[scale]['x_base'], 0.0))  # 0.5
-        format = self.scales[scale]['format']
+        format_str = self.scales[scale]['format']
         ax.xaxis.set_major_formatter(ticker.FuncFormatter(
-            lambda x, pos: f"{self.df_ok.index[np.clip(int(x), 0, len(self.df_ok.index) - 1)].strftime(format)}")
+            lambda x, pos: f"{self.df_ok.index[np.clip(int(x), 0, len(self.df_ok.index) - 1)].strftime(format_str)}")
         )
         ax.tick_params(axis='x', labelrotation=90.)
         ax.set_xlabel(self.scales[scale]['units'])
@@ -135,9 +129,10 @@ class PltPing:
         # set y axis
         ax.set_ylabel('Average ping\nto outside (in ms)')
 
-    def write_stat(self):
+    @staticmethod
+    def write_stat():
         print("updatng stat.txt")
-        with open(f"{result_folder}/stat.txt", "w") as f:
+        with open(f"{RESULT_DIR}/stat.txt", "w") as f:
             msg = f"Charts created at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             f.write(msg)
 
@@ -152,7 +147,7 @@ class PltPing:
             self.draw_heat_ok(fig, ax2, scale)
             fig.subplots_adjust(hspace=0)
             # plt.tight_layout()
-            fname = f"{result_folder}/{scale}.png"
+            fname = f"{RESULT_DIR}/{scale}.png"
             fig.savefig(fname=fname)
             print(f"Figure for {scale} is saved to {fname}")
             # fig.show()
@@ -162,10 +157,11 @@ class PltPing:
     @staticmethod
     def update_server_files() -> bool:
         print('updating server files ...')
-        cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/tst/'
-        r = subprocess.check_call(cmd,cwd=result_folder,shell=True)
+        cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/'
+        r = subprocess.check_call(cmd, cwd=RESULT_DIR, shell=True)
         # print(f"execute command {cmd} in cwd={result_folder}")
-        return r==0
+        return r == 0
+
 
 if __name__ == '__main__':
     print('start')
