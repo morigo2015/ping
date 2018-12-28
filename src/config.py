@@ -10,5 +10,9 @@ _CONFIG_DIR = f"{_WORK_DIR}/config"
 _DEVICES_FNAME = "devices.json"
 RESULT_DIR = f"{_WORK_DIR}/to_server"
 
+REMOTE_SERVER = "im@st"
+REMOTE_WEB_DIR = "~/webserv"
+
 DevInfo = namedtuple('DevInfo','name, host, seqn')
 Devices : List[NamedTuple] = [DevInfo._make(d) for d in json.load(open(f"{_CONFIG_DIR}/{_DEVICES_FNAME}"))]
+

@@ -1,14 +1,17 @@
 import datetime
 import subprocess
 import time
-
+import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
+
 import pandas as pd
 
-from config import DevInfo, Devices, RESULT_DIR
+from config import DevInfo, Devices, RESULT_DIR, REMOTE_SERVER, REMOTE_WEB_DIR
 from my_db import MyDb
 
 PING_THRESHOLD = 25
@@ -156,10 +159,16 @@ class PltPing:
 
     @staticmethod
     def update_server_files() -> bool:
-        print('updating server files ...')
-        cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * im@st:~/'
+        send_mode = 'to_local' if os.path.exists(f"{os.environ['HOME']}/webserv") else 'to_remote' # remove to config later
+        if send_mode == 'to_remote':
+            cmd = f'/home/im/cloud/google-cloud-sdk/bin/gcloud compute scp * {REMOTE_SERVER}:{REMOTE_WEB_DIR}'
+        elif send_mode == 'to_local':
+            cmd = f'cp * {REMOTE_WEB_DIR}'
+        else:
+            print("Can't define send_mode. Something wrong with config.py")
+            cmd = ""
+        print(f"Updating server files at {REMOTE_SERVER}:{REMOTE_WEB_DIR}. Command={cmd}")
         r = subprocess.check_call(cmd, cwd=RESULT_DIR, shell=True)
-        # print(f"execute command {cmd} in cwd={result_folder}")
         return r == 0
 
 
